@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Room - e-Hotels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="staff-layout">
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">e<span>Hotels</span></a>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Operations</div>
+            <a href="/employee/dashboard" class="sidebar-link">Dashboard</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Administration</div>
+            <a href="/admin/customers" class="sidebar-link">Customers</a>
+            <a href="/admin/employees" class="sidebar-link">Employees</a>
+            <a href="/admin/hotels" class="sidebar-link">Hotels</a>
+            <a href="/admin/rooms" class="sidebar-link active">Rooms</a>
+        </div>
+    </aside>
+
+    <main class="staff-main">
+        <div class="staff-topbar">
+            <span class="staff-topbar-title">Administration / Rooms / Edit</span>
+        </div>
+        <div class="staff-content">
+            <div class="page-header">
+                <h1 class="page-title">Edit Room</h1>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Update Room Details</div>
+                <form th:action="@{/admin/rooms/edit/{id}(id=${room.roomId})}" method="post">
+                    <div class="form-grid form-grid-4 mb-3">
+                        <div class="form-group">
+                            <label class="form-label">Hotel</label>
+                            <select name="hotelId" class="form-select" required>
+                                <option th:each="h : ${hotels}" th:value="${h.hotelId}" th:text="${h.name}" th:selected="${room.hotelId == h.hotelId}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Room #</label>
+                            <input type="text" name="roomNumber" th:value="${room.roomNumber}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Capacity</label>
+                            <select name="capacity" class="form-select" required>
+                                <option value="single" th:selected="${room.capacity == 'single'}">Single</option>
+                                <option value="double" th:selected="${room.capacity == 'double'}">Double</option>
+                                <option value="triple" th:selected="${room.capacity == 'triple'}">Triple</option>
+                                <option value="quad" th:selected="${room.capacity == 'quad'}">Quad</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Price ($)</label>
+                            <input type="number" name="price" th:value="${room.price}" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-grid form-grid-4">
+                        <div class="form-group">
+                            <label class="form-label">View</label>
+                            <select name="viewType" class="form-select">
+                                <option value="" th:selected="${room.viewType == null || room.viewType == ''}">None</option>
+                                <option value="city" th:selected="${room.viewType == 'city'}">City</option>
+                                <option value="sea" th:selected="${room.viewType == 'sea'}">Sea</option>
+                                <option value="mountain" th:selected="${room.viewType == 'mountain'}">Mountain</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Problems</label>
+                            <input type="text" name="problems" th:value="${room.problems}" class="form-control" placeholder="Optional notes">
+                        </div>
+                        <div class="form-group form-group--end">
+                            <div class="form-check">
+                                <input type="checkbox" name="extendable" value="true" class="form-check-input" th:checked="${room.extendable}">
+                                <label class="form-check-label">Extendable</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-group--end">
+                            <button class="btn btn-primary btn-full">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <a href="/admin/rooms" class="btn btn-secondary">Back to Rooms</a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - e-Hotels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="staff-layout">
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">e<span>Hotels</span></a>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Operations</div>
+            <a href="/employee/dashboard" class="sidebar-link active">Dashboard</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Administration</div>
+            <a href="/admin/customers" class="sidebar-link">Customers</a>
+            <a href="/admin/employees" class="sidebar-link">Employees</a>
+            <a href="/admin/hotels" class="sidebar-link">Hotels</a>
+            <a href="/admin/rooms" class="sidebar-link">Rooms</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Views</div>
+            <a href="/views/available-rooms" class="sidebar-link">Available Rooms</a>
+            <a href="/views/hotel-capacity" class="sidebar-link">Hotel Capacity</a>
+        </div>
+    </aside>
+
+    <main class="staff-main">
+        <div class="staff-topbar">
+            <span class="staff-topbar-title">Employee Dashboard</span>
+        </div>
+        <div class="staff-content">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Manage check-ins, walk-in rentals, and payments</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Check-in: Convert Booking to Renting</div>
+                <div th:if="${!activeBookings.isEmpty()}" class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr><th>Booking ID</th><th>Customer</th><th>Room</th><th>Dates</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${activeBookings}">
+                                <td><strong th:text="'#' + ${b.bookingId}"></strong></td>
+                                <td th:text="${b.customerId}"></td>
+                                <td th:text="${b.roomId}"></td>
+                                <td th:text="${b.startDate} + ' to ' + ${b.endDate}"></td>
+                                <td>
+                                    <form action="/employee/check-in" method="post" class="inline-form">
+                                        <input type="hidden" name="bookingId" th:value="${b.bookingId}">
+                                        <select name="employeeId" class="form-select form-select-sm" style="width:180px;" required>
+                                            <option value="">Employee</option>
+                                            <option th:each="e : ${employees}" th:value="${e.employeeId}" th:text="${e.fullName}"></option>
+                                        </select>
+                                        <button class="btn btn-success btn-sm">Check In</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:if="${activeBookings.isEmpty()}" class="empty-state">
+                    <p>No active bookings to check in.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Walk-in Renting (No Prior Booking)</div>
+                <form action="/employee/walk-in" method="post">
+                    <div class="form-grid form-grid-3 mb-3">
+                        <div class="form-group">
+                            <label class="form-label">Room</label>
+                            <select name="roomId" class="form-select" required>
+                                <option value="">Select room</option>
+                                <option th:each="r : ${rooms}" th:value="${r.roomId}" th:text="${'#' + r.roomNumber + ' ($' + r.price + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Customer</label>
+                            <select name="customerId" class="form-select" required>
+                                <option value="">Select customer</option>
+                                <option th:each="c : ${customers}" th:value="${c.customerId}" th:text="${c.fullName}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employee</label>
+                            <select name="employeeId" class="form-select" required>
+                                <option value="">Select employee</option>
+                                <option th:each="e : ${employees}" th:value="${e.employeeId}" th:text="${e.fullName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid form-grid-3">
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="startDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="endDate" class="form-control" required>
+                        </div>
+                        <div class="form-group form-group--end">
+                            <button class="btn btn-primary btn-full">Create Walk-in Renting</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Record Payment</div>
+                <div th:if="${!activeRentings.isEmpty()}" class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr><th>Renting ID</th><th>Customer</th><th>Room</th><th>Dates</th><th>Payment</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${activeRentings}">
+                                <td><strong th:text="'#' + ${r.rentingId}"></strong></td>
+                                <td th:text="${r.customerId}"></td>
+                                <td th:text="${r.roomId}"></td>
+                                <td th:text="${r.startDate} + ' to ' + ${r.endDate}"></td>
+                                <td>
+                                    <form action="/employee/payment" method="post" class="inline-form">
+                                        <input type="hidden" name="rentingId" th:value="${r.rentingId}">
+                                        <input type="number" name="amount" step="0.01" class="form-control form-control-sm" style="width:120px;" placeholder="Amount" required>
+                                        <button class="btn btn-amber btn-sm">Pay</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:if="${activeRentings.isEmpty()}" class="empty-state">
+                    <p>No active rentings to process payment.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
