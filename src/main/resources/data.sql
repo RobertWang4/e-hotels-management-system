@@ -208,6 +208,14 @@ UPDATE hotel SET manager_employee_id = 75 WHERE hotel_id = 38;
 UPDATE hotel SET manager_employee_id = 77 WHERE hotel_id = 39;
 UPDATE hotel SET manager_employee_id = 79 WHERE hotel_id = 40;
 
+DO '
+BEGIN
+    IF EXISTS (SELECT 1 FROM hotel WHERE manager_employee_id IS NULL) THEN
+        RAISE EXCEPTION ''Sample data requires every hotel to have a manager.'';
+    END IF;
+END
+';
+
 -- 5. Employee Roles
 INSERT INTO employee_role (role_id, name) VALUES
 (1, 'Manager'),
@@ -235,7 +243,7 @@ INSERT INTO employee_has_role (employee_id, role_id) VALUES
 (54, 4), (58, 4), (62, 4), (64, 4), (66, 4), (68, 4), (70, 4), (72, 4),
 (74, 4), (76, 4), (78, 4), (80, 4);
 
--- 7. Customers (20)
+-- 7. Customers (40)
 INSERT INTO customer (customer_id, full_name, address, id_type, id_number, registration_date) VALUES
 (1,  'John Smith',          '10 Elm St, Toronto, ON',          'passport',         'CA12345678',  '2025-06-15'),
 (2,  'Maria Garcia',        '22 Pine Ave, Montreal, QC',       'driver_license',   'QC-G1234567', '2025-07-20'),
@@ -256,9 +264,29 @@ INSERT INTO customer (customer_id, full_name, address, id_type, id_number, regis
 (17, 'David Tremblay',      '202 Alder St, Moncton, NB',       'driver_license',   'NB-C8765432', '2026-03-10'),
 (18, 'Nina Johal',          '214 Cypress Ave, Niagara Falls, ON','passport',        'CA87654321',  '2026-03-15'),
 (19, 'Lucas Bergeron',      '226 Walnut Rd, Thunder Bay, ON',  'driver_license',   'ON-E3456789', '2026-03-22'),
-(20, 'Aisha Mohammed',      '238 Ivy Blvd, Toronto, ON',       'national_id',      'CA2233445566','2026-03-30');
+(20, 'Aisha Mohammed',      '238 Ivy Blvd, Toronto, ON',       'national_id',      'CA2233445566','2026-03-30'),
+(21, 'Mateo Alvarez',       '250 Harbourfront Dr, Toronto, ON', 'passport',        'ES45671234',  '2026-04-02'),
+(22, 'Claire Gagnon',       '262 Rue Cartier, Quebec, QC',      'driver_license',  'QC-L3344556', '2026-04-03'),
+(23, 'Minseo Park',         '274 Alberni St, Vancouver, BC',    'passport',        'KR20261234',  '2026-04-03'),
+(24, 'Noor Khan',           '286 Sussex Dr, Ottawa, ON',        'national_id',     'PK7788990011','2026-04-04'),
+(25, 'Gabriel Costa',       '298 17 Ave SW, Calgary, AB',       'passport',        'BR44556677',  '2026-04-04'),
+(26, 'Sabrina Muller',      '310 Jasper Ave, Edmonton, AB',     'passport',        'DE66778855',  '2026-04-05'),
+(27, 'Julien Mercier',      '322 Rene Levesque Blvd, Montreal, QC', 'driver_license', 'QC-M9988776', '2026-04-05'),
+(28, 'Harper Wilson',       '334 Portage Ave, Winnipeg, MB',    'driver_license',  'MB-W2233445', '2026-04-06'),
+(29, 'Sana Siddiqui',       '346 Spring Garden Rd, Halifax, NS','passport',        'CA55443322',  '2026-04-06'),
+(30, 'Diego Romero',        '358 Robson St, Vancouver, BC',     'passport',        'MX66770011',  '2026-04-07'),
+(31, 'Leila Haddad',        '370 Main St, Hamilton, ON',        'national_id',     'MA1122558899','2026-04-07'),
+(32, 'Ethan McLeod',        '382 Sparks St, Ottawa, ON',        'driver_license',  'ON-M5566778', '2026-04-08'),
+(33, 'Camille Roy',         '394 Rue Peel, Montreal, QC',       'passport',        'FR88990011',  '2026-04-08'),
+(34, 'Arjun Nair',          '406 Burnhamthorpe Rd, Mississauga, ON', 'passport',   'IN66554433',  '2026-04-09'),
+(35, 'Zoe Campbell',        '418 Princess St, Kingston, ON',    'driver_license',  'ON-K1122998', '2026-04-09'),
+(36, 'Mila Petrovic',       '430 Victoria Ave, Regina, SK',     'passport',        'RS77112233',  '2026-04-10'),
+(37, 'Nathan Sinclair',     '442 Mountain Rd, Moncton, NB',     'driver_license',  'NB-S4433221', '2026-04-10'),
+(38, 'Yara El-Sayed',       '454 King George Blvd, Surrey, BC', 'passport',        'EG99110022',  '2026-04-11'),
+(39, 'Oliver Bennett',      '466 Fallsview Blvd, Niagara Falls, ON', 'driver_license', 'ON-N7766554', '2026-04-11'),
+(40, 'Ines Ferreira',       '478 20th St E, Saskatoon, SK',     'passport',        'PT30304550',  '2026-04-12');
 
-SELECT setval('customer_customer_id_seq', 20);
+SELECT setval('customer_customer_id_seq', 40);
 
 -- 8. Rooms (5 per hotel = 200 total)
 -- Hotel 1 - Marriott Downtown Toronto (5-star)
@@ -838,55 +866,200 @@ INSERT INTO room_amenity (room_id, amenity_id) VALUES
 (199,1),(199,2),(199,3),(199,4),(199,5),(199,6),
 (200,1),(200,2),(200,3);
 
--- 11. Bookings (~20, various statuses, dates around 2026)
-INSERT INTO booking (booking_id, customer_id, room_id, start_date, end_date, status) VALUES
-(1,  1,  2,  '2026-04-10', '2026-04-14', 'active'),
-(2,  2,  12, '2026-04-15', '2026-04-18', 'active'),
-(3,  3,  42, '2026-05-01', '2026-05-05', 'active'),
-(4,  4,  82, '2026-05-10', '2026-05-13', 'active'),
-(5,  5,  92, '2026-06-01', '2026-06-04', 'active'),
-(6,  6,  102,'2026-06-15', '2026-06-20', 'active'),
-(7,  7,  147,'2026-07-01', '2026-07-05', 'active'),
-(8,  8,  32, '2026-04-08', '2026-04-11', 'cancelled'),
-(9,  9,  47, '2026-04-20', '2026-04-23', 'cancelled'),
-(10, 10, 97, '2026-05-05', '2026-05-08', 'cancelled'),
-(11, 11, 62, '2026-03-01', '2026-03-04', 'rented'),
-(12, 12, 112,'2026-03-05', '2026-03-09', 'rented'),
-(13, 13, 142,'2026-03-10', '2026-03-13', 'rented'),
-(14, 14, 167,'2026-03-15', '2026-03-18', 'rented'),
-(15, 15, 172,'2026-03-20', '2026-03-24', 'rented'),
-(16, 16, 137,'2026-07-10', '2026-07-14', 'active'),
-(17, 17, 192,'2026-07-20', '2026-07-23', 'active'),
-(18, 18, 77, '2026-08-01', '2026-08-05', 'active'),
-(19, 19, 132,'2026-08-10', '2026-08-13', 'active'),
-(20, 20, 197,'2026-08-15', '2026-08-20', 'active');
+-- 11. Bookings (40, various statuses and seasons across 2026)
+INSERT INTO booking (
+    booking_id, customer_id, room_id,
+    customer_name_snapshot, customer_id_number_snapshot,
+    room_number_snapshot, hotel_name_snapshot, room_price_snapshot, room_capacity_snapshot,
+    start_date, end_date, status
+)
+SELECT
+    v.booking_id,
+    v.customer_id,
+    v.room_id,
+    c.full_name,
+    c.id_number,
+    r.room_number,
+    h.name,
+    r.price,
+    r.capacity,
+    v.start_date::date,
+    v.end_date::date,
+    v.status
+FROM (
+    VALUES
+    (1,  1,  2,  '2026-04-10', '2026-04-14', 'active'),
+    (2,  2,  12, '2026-04-15', '2026-04-18', 'active'),
+    (3,  3,  42, '2026-05-01', '2026-05-05', 'active'),
+    (4,  4,  82, '2026-05-10', '2026-05-13', 'active'),
+    (5,  5,  92, '2026-06-01', '2026-06-04', 'active'),
+    (6,  6,  102,'2026-06-15', '2026-06-20', 'active'),
+    (7,  7,  147,'2026-07-01', '2026-07-05', 'active'),
+    (8,  8,  32, '2026-04-08', '2026-04-11', 'cancelled'),
+    (9,  9,  47, '2026-04-20', '2026-04-23', 'cancelled'),
+    (10, 10, 97, '2026-05-05', '2026-05-08', 'cancelled'),
+    (11, 11, 62, '2026-03-01', '2026-03-04', 'rented'),
+    (12, 12, 112,'2026-03-05', '2026-03-09', 'rented'),
+    (13, 13, 142,'2026-03-10', '2026-03-13', 'rented'),
+    (14, 14, 167,'2026-03-15', '2026-03-18', 'rented'),
+    (15, 15, 172,'2026-03-20', '2026-03-24', 'rented'),
+    (16, 16, 137,'2026-07-10', '2026-07-14', 'active'),
+    (17, 17, 192,'2026-07-20', '2026-07-23', 'active'),
+    (18, 18, 77, '2026-08-01', '2026-08-05', 'active'),
+    (19, 19, 132,'2026-08-10', '2026-08-13', 'active'),
+    (20, 20, 197,'2026-08-15', '2026-08-20', 'active'),
+    (21, 21, 6,  '2026-01-12', '2026-01-15', 'rented'),
+    (22, 22, 31, '2026-01-18', '2026-01-22', 'rented'),
+    (23, 23, 56, '2026-02-02', '2026-02-06', 'rented'),
+    (24, 24, 86, '2026-02-10', '2026-02-14', 'rented'),
+    (25, 25, 171,'2026-02-18', '2026-02-21', 'rented'),
+    (26, 26, 16, '2026-09-03', '2026-09-07', 'active'),
+    (27, 27, 36, '2026-09-10', '2026-09-13', 'active'),
+    (28, 28, 66, '2026-09-15', '2026-09-19', 'active'),
+    (29, 29, 96, '2026-09-20', '2026-09-23', 'active'),
+    (30, 30, 121,'2026-10-01', '2026-10-05', 'active'),
+    (31, 31, 146,'2026-10-08', '2026-10-12', 'active'),
+    (32, 32, 176,'2026-10-14', '2026-10-17', 'active'),
+    (33, 33, 186,'2026-10-20', '2026-10-24', 'active'),
+    (34, 34, 41, '2026-11-02', '2026-11-06', 'active'),
+    (35, 35, 116,'2026-11-10', '2026-11-13', 'active'),
+    (36, 36, 111,'2026-05-01', '2026-05-04', 'cancelled'),
+    (37, 37, 151,'2026-06-11', '2026-06-15', 'cancelled'),
+    (38, 38, 181,'2026-07-06', '2026-07-09', 'cancelled'),
+    (39, 39, 11, '2026-08-03', '2026-08-06', 'cancelled'),
+    (40, 40, 71, '2026-12-01', '2026-12-04', 'cancelled')
+) AS v(booking_id, customer_id, room_id, start_date, end_date, status)
+JOIN customer c ON c.customer_id = v.customer_id
+JOIN room r ON r.room_id = v.room_id
+JOIN hotel h ON h.hotel_id = r.hotel_id;
 
-SELECT setval('booking_booking_id_seq', 20);
+SELECT setval('booking_booking_id_seq', 40);
 
--- 12. Rentings (~15, some from bookings, some walk-in)
-INSERT INTO renting (renting_id, customer_id, room_id, employee_id, booking_id, start_date, end_date, status) VALUES
--- From bookings (booking status = 'rented')
-(1,  11, 62,  25, 11, '2026-03-01', '2026-03-04', 'completed'),
-(2,  12, 112, 45, 12, '2026-03-05', '2026-03-09', 'completed'),
-(3,  13, 142, 57, 13, '2026-03-10', '2026-03-13', 'completed'),
-(4,  14, 167, 67, 14, '2026-03-15', '2026-03-18', 'completed'),
-(5,  15, 172, 69, 15, '2026-03-20', '2026-03-24', 'completed'),
--- Walk-in rentings (no booking)
-(6,  1,  41,  17, NULL, '2026-02-10', '2026-02-13', 'completed'),
-(7,  3,  81,  33, NULL, '2026-02-15', '2026-02-18', 'completed'),
-(8,  5,  91,  37, NULL, '2026-02-20', '2026-02-23', 'completed'),
-(9,  7,  26,  11, NULL, '2026-03-01', '2026-03-05', 'completed'),
-(10, 9,  46,  19, NULL, '2026-03-08', '2026-03-11', 'completed'),
--- Active rentings
-(11, 2,  22,  9,  NULL, '2026-04-01', '2026-04-06', 'active'),
-(12, 4,  107, 43, NULL, '2026-04-02', '2026-04-07', 'active'),
-(13, 6,  52,  21, NULL, '2026-04-03', '2026-04-08', 'active'),
-(14, 10, 162, 65, NULL, '2026-04-04', '2026-04-09', 'active'),
-(15, 20, 196, 79, NULL, '2026-04-05', '2026-04-10', 'active');
+-- 12. Rentings (25, mix of booking conversions and walk-ins)
+INSERT INTO renting (
+    renting_id, customer_id, room_id, employee_id, booking_id,
+    customer_name_snapshot, customer_id_number_snapshot,
+    room_number_snapshot, hotel_name_snapshot, room_price_snapshot, room_capacity_snapshot,
+    start_date, end_date, status
+)
+SELECT
+    v.renting_id,
+    v.customer_id,
+    v.room_id,
+    v.employee_id,
+    v.booking_id,
+    COALESCE(b.customer_name_snapshot, c.full_name),
+    COALESCE(b.customer_id_number_snapshot, c.id_number),
+    COALESCE(b.room_number_snapshot, r.room_number),
+    COALESCE(b.hotel_name_snapshot, h.name),
+    COALESCE(b.room_price_snapshot, r.price),
+    COALESCE(b.room_capacity_snapshot, r.capacity),
+    v.start_date::date,
+    v.end_date::date,
+    v.status
+FROM (
+    VALUES
+    (1,  11, 62,  25, 11,   '2026-03-01', '2026-03-04', 'completed'),
+    (2,  12, 112, 45, 12,   '2026-03-05', '2026-03-09', 'completed'),
+    (3,  13, 142, 57, 13,   '2026-03-10', '2026-03-13', 'completed'),
+    (4,  14, 167, 67, 14,   '2026-03-15', '2026-03-18', 'completed'),
+    (5,  15, 172, 69, 15,   '2026-03-20', '2026-03-24', 'completed'),
+    (6,  1,  41,  17, NULL, '2026-02-10', '2026-02-13', 'completed'),
+    (7,  3,  81,  33, NULL, '2026-02-15', '2026-02-18', 'completed'),
+    (8,  5,  91,  37, NULL, '2026-02-20', '2026-02-23', 'completed'),
+    (9,  7,  26,  11, NULL, '2026-03-01', '2026-03-05', 'completed'),
+    (10, 9,  46,  19, NULL, '2026-03-08', '2026-03-11', 'completed'),
+    (11, 2,  22,  9,  NULL, '2026-04-01', '2026-04-06', 'active'),
+    (12, 4,  107, 43, NULL, '2026-04-02', '2026-04-07', 'active'),
+    (13, 6,  52,  21, NULL, '2026-04-03', '2026-04-08', 'active'),
+    (14, 10, 162, 65, NULL, '2026-04-04', '2026-04-09', 'active'),
+    (15, 20, 196, 79, NULL, '2026-04-05', '2026-04-10', 'active'),
+    (16, 21, 6,   3,  21,   '2026-01-12', '2026-01-15', 'completed'),
+    (17, 22, 31,  13, 22,   '2026-01-18', '2026-01-22', 'completed'),
+    (18, 23, 56,  23, 23,   '2026-02-02', '2026-02-06', 'completed'),
+    (19, 24, 86,  35, 24,   '2026-02-10', '2026-02-14', 'completed'),
+    (20, 25, 171, 69, 25,   '2026-02-18', '2026-02-21', 'completed'),
+    (21, 31, 126, 51, NULL, '2026-02-25', '2026-02-28', 'completed'),
+    (22, 32, 156, 63, NULL, '2026-03-12', '2026-03-16', 'completed'),
+    (23, 33, 188, 75, NULL, '2026-03-18', '2026-03-21', 'completed'),
+    (24, 34, 73,  29, NULL, '2026-03-22', '2026-03-25', 'completed'),
+    (25, 35, 118, 47, NULL, '2026-03-27', '2026-03-30', 'completed')
+) AS v(renting_id, customer_id, room_id, employee_id, booking_id, start_date, end_date, status)
+JOIN customer c ON c.customer_id = v.customer_id
+JOIN room r ON r.room_id = v.room_id
+JOIN hotel h ON h.hotel_id = r.hotel_id
+LEFT JOIN booking b ON b.booking_id = v.booking_id;
 
-SELECT setval('renting_renting_id_seq', 15);
+SELECT setval('renting_renting_id_seq', 25);
 
--- 13. Payments (~10)
+DO '
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM booking
+        WHERE customer_name_snapshot IS NULL
+           OR customer_id_number_snapshot IS NULL
+           OR room_number_snapshot IS NULL
+           OR hotel_name_snapshot IS NULL
+           OR room_price_snapshot IS NULL
+           OR room_capacity_snapshot IS NULL
+    ) THEN
+        RAISE EXCEPTION ''Booking history must keep readable snapshots.'';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM renting
+        WHERE customer_name_snapshot IS NULL
+           OR customer_id_number_snapshot IS NULL
+           OR room_number_snapshot IS NULL
+           OR hotel_name_snapshot IS NULL
+           OR room_price_snapshot IS NULL
+           OR room_capacity_snapshot IS NULL
+    ) THEN
+        RAISE EXCEPTION ''Renting history must keep readable snapshots.'';
+    END IF;
+END
+';
+
+-- Demo search window sanity check:
+-- These rooms must remain available for 2026-04-07 to 2026-04-17 so the search page
+-- always has obvious results to show during grading / manual testing.
+-- Room 1   = Marriott Downtown Toronto / 101
+-- Room 31  = Marriott Winnipeg Downtown / 101
+-- Room 61  = Hilton London Ontario / 101
+-- Room 121 = Wyndham Regina / 101
+-- Room 171 = InterContinental Vancouver / 101
+DO '
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM (
+            VALUES (1), (31), (61), (121), (171)
+        ) AS demo(room_id)
+        WHERE EXISTS (
+            SELECT 1
+            FROM booking b
+            WHERE b.room_id = demo.room_id
+              AND b.status = ''active''
+              AND b.start_date < DATE ''2026-04-17''
+              AND b.end_date > DATE ''2026-04-07''
+        )
+        OR EXISTS (
+            SELECT 1
+            FROM renting r
+            WHERE r.room_id = demo.room_id
+              AND r.status = ''active''
+              AND r.start_date < DATE ''2026-04-17''
+              AND r.end_date > DATE ''2026-04-07''
+        )
+    ) THEN
+        RAISE EXCEPTION ''Sample data must keep demo rooms available for 2026-04-07 to 2026-04-17.'';
+    END IF;
+END
+';
+
+-- 13. Payments (20)
 INSERT INTO payment (payment_id, renting_id, amount, paid_at) VALUES
 (1,  1,  345.00,  '2026-03-04 11:30:00'),
 (2,  2,  900.00,  '2026-03-09 10:00:00'),
@@ -897,6 +1070,16 @@ INSERT INTO payment (payment_id, renting_id, amount, paid_at) VALUES
 (7,  7,  585.00,  '2026-02-18 11:00:00'),
 (8,  8,  450.00,  '2026-02-23 09:30:00'),
 (9,  9,  400.00,  '2026-03-05 13:00:00'),
-(10, 10, 570.00,  '2026-03-11 10:45:00');
+(10, 10, 570.00,  '2026-03-11 10:45:00'),
+(11, 16, 450.00,  '2026-01-15 10:10:00'),
+(12, 17, 320.00,  '2026-01-22 12:20:00'),
+(13, 18, 720.00,  '2026-02-06 09:05:00'),
+(14, 19, 640.00,  '2026-02-14 14:40:00'),
+(15, 20, 1140.00, '2026-02-21 11:25:00'),
+(16, 21, 420.00,  '2026-02-28 10:50:00'),
+(17, 22, 510.00,  '2026-03-16 15:00:00'),
+(18, 23, 645.00,  '2026-03-21 13:35:00'),
+(19, 24, 930.00,  '2026-03-25 16:10:00'),
+(20, 25, 540.00,  '2026-03-30 11:55:00');
 
-SELECT setval('payment_payment_id_seq', 10);
+SELECT setval('payment_payment_id_seq', 20);

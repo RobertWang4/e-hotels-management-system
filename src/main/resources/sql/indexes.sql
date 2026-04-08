@@ -1,0 +1,10 @@
+CREATE INDEX IF NOT EXISTS idx_hotel_area ON hotel(area);
+CREATE INDEX IF NOT EXISTS idx_booking_room_dates ON booking(room_id, start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_booking_status ON booking(status);
+CREATE INDEX IF NOT EXISTS idx_room_price ON room(price);
+CREATE INDEX IF NOT EXISTS idx_renting_room_dates ON renting(room_id, start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_renting_status ON renting(status);
+CREATE INDEX IF NOT EXISTS idx_hotel_chain_category ON hotel(chain_id, category);
+CREATE INDEX IF NOT EXISTS idx_renting_room ON renting(room_id);
+CREATE INDEX IF NOT EXISTS idx_payment_renting ON payment(renting_id);
+CREATE INDEX IF NOT EXISTS idx_customer_reg_date ON customer(registration_date);

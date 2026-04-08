@@ -14,6 +14,9 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private ReservationSnapshotService reservationSnapshotService;
+
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
@@ -24,6 +27,7 @@ public class BookingService {
 
     @CacheEvict(value = "availableRooms", allEntries = true)
     public Booking createBooking(Booking booking) {
+        reservationSnapshotService.populateBookingSnapshot(booking);
         booking.setStatus("active");
         booking.setCreatedAt(LocalDateTime.now());
         return bookingRepository.save(booking);

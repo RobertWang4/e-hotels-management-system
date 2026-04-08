@@ -6,11 +6,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findByHotelId(Integer hotelId);
 
-    @Query("SELECT r FROM Room r JOIN Hotel h ON r.hotelId = h.hotelId " +
+    @Query("SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.amenities")
+    List<Room> findAllWithAmenities();
+
+    @Query("SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.amenities WHERE r.roomId = :roomId")
+    Optional<Room> findWithAmenitiesById(@Param("roomId") Integer roomId);
+
+    @Query("SELECT DISTINCT r FROM Room r JOIN Hotel h ON r.hotelId = h.hotelId LEFT JOIN FETCH r.amenities " +
            "WHERE (:area IS NULL OR h.area = :area) " +
            "AND (:chainId IS NULL OR h.chainId = :chainId) " +
            "AND (:category IS NULL OR h.category = :category) " +

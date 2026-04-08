@@ -7,29 +7,29 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body>
 <div class="staff-layout">
     <aside class="sidebar">
-        <a href="/" class="sidebar-brand">e<span>Hotels</span></a>
+        <a href="index.html" th:href="@{/}" class="sidebar-brand">e<span>Hotels</span></a>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Operations</div>
-            <a href="/employee/dashboard" class="sidebar-link active">Dashboard</a>
+            <a href="employee-dashboard.html" th:href="@{/employee/dashboard}" class="sidebar-link active">Dashboard</a>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Administration</div>
-            <a href="/admin/customers" class="sidebar-link">Customers</a>
-            <a href="/admin/employees" class="sidebar-link">Employees</a>
-            <a href="/admin/hotels" class="sidebar-link">Hotels</a>
-            <a href="/admin/rooms" class="sidebar-link">Rooms</a>
+            <a href="admin/customers.html" th:href="@{/admin/customers}" class="sidebar-link">Customers</a>
+            <a href="admin/employees.html" th:href="@{/admin/employees}" class="sidebar-link">Employees</a>
+            <a href="admin/hotels.html" th:href="@{/admin/hotels}" class="sidebar-link">Hotels</a>
+            <a href="admin/rooms.html" th:href="@{/admin/rooms}" class="sidebar-link">Rooms</a>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Views</div>
-            <a href="/views/available-rooms" class="sidebar-link">Available Rooms</a>
-            <a href="/views/hotel-capacity" class="sidebar-link">Hotel Capacity</a>
+            <a href="views/available-rooms.html" th:href="@{/views/available-rooms}" class="sidebar-link">Available Rooms</a>
+            <a href="views/hotel-capacity.html" th:href="@{/views/hotel-capacity}" class="sidebar-link">Hotel Capacity</a>
         </div>
     </aside>
 
@@ -53,11 +53,17 @@
                         <tbody>
                             <tr th:each="b : ${activeBookings}">
                                 <td><strong th:text="'#' + ${b.bookingId}"></strong></td>
-                                <td th:text="${b.customerId}"></td>
-                                <td th:text="${b.roomId}"></td>
+                                <td>
+                                    <div><strong th:text="${b.customerNameSnapshot}"></strong></div>
+                                    <div class="text-muted" th:text="${b.customerIdNumberSnapshot}"></div>
+                                </td>
+                                <td>
+                                    <div><strong th:text="${b.hotelNameSnapshot + ' / Room #' + b.roomNumberSnapshot}"></strong></div>
+                                    <div class="text-muted" th:text="${b.roomCapacitySnapshot + ' · $' + b.roomPriceSnapshot}"></div>
+                                </td>
                                 <td th:text="${b.startDate} + ' to ' + ${b.endDate}"></td>
                                 <td>
-                                    <form action="/employee/check-in" method="post" class="inline-form">
+                                    <form action="employee-dashboard.html" th:action="@{/employee/check-in}" method="post" class="inline-form">
                                         <input type="hidden" name="bookingId" th:value="${b.bookingId}">
                                         <select name="employeeId" class="form-select form-select-sm" style="width:180px;" required>
                                             <option value="">Employee</option>
@@ -77,7 +83,7 @@
 
             <div class="card">
                 <div class="card-header">Walk-in Renting (No Prior Booking)</div>
-                <form action="/employee/walk-in" method="post">
+                <form action="employee-dashboard.html" th:action="@{/employee/walk-in}" method="post">
                     <div class="form-grid form-grid-3 mb-3">
                         <div class="form-group">
                             <label class="form-label">Room</label>
@@ -127,11 +133,17 @@
                         <tbody>
                             <tr th:each="r : ${activeRentings}">
                                 <td><strong th:text="'#' + ${r.rentingId}"></strong></td>
-                                <td th:text="${r.customerId}"></td>
-                                <td th:text="${r.roomId}"></td>
+                                <td>
+                                    <div><strong th:text="${r.customerNameSnapshot}"></strong></div>
+                                    <div class="text-muted" th:text="${r.customerIdNumberSnapshot}"></div>
+                                </td>
+                                <td>
+                                    <div><strong th:text="${r.hotelNameSnapshot + ' / Room #' + r.roomNumberSnapshot}"></strong></div>
+                                    <div class="text-muted" th:text="${r.roomCapacitySnapshot + ' · $' + r.roomPriceSnapshot}"></div>
+                                </td>
                                 <td th:text="${r.startDate} + ' to ' + ${r.endDate}"></td>
                                 <td>
-                                    <form action="/employee/payment" method="post" class="inline-form">
+                                    <form action="employee-dashboard.html" th:action="@{/employee/payment}" method="post" class="inline-form">
                                         <input type="hidden" name="rentingId" th:value="${r.rentingId}">
                                         <input type="number" name="amount" step="0.01" class="form-control form-control-sm" style="width:120px;" placeholder="Amount" required>
                                         <button class="btn btn-amber btn-sm">Pay</button>

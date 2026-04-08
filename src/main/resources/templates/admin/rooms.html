@@ -7,29 +7,29 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body>
 <div class="staff-layout">
     <aside class="sidebar">
-        <a href="/" class="sidebar-brand">e<span>Hotels</span></a>
+        <a href="../index.html" th:href="@{/}" class="sidebar-brand">e<span>Hotels</span></a>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Operations</div>
-            <a href="/employee/dashboard" class="sidebar-link">Dashboard</a>
+            <a href="../employee-dashboard.html" th:href="@{/employee/dashboard}" class="sidebar-link">Dashboard</a>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Administration</div>
-            <a href="/admin/customers" class="sidebar-link">Customers</a>
-            <a href="/admin/employees" class="sidebar-link">Employees</a>
-            <a href="/admin/hotels" class="sidebar-link">Hotels</a>
-            <a href="/admin/rooms" class="sidebar-link active">Rooms</a>
+            <a href="customers.html" th:href="@{/admin/customers}" class="sidebar-link">Customers</a>
+            <a href="employees.html" th:href="@{/admin/employees}" class="sidebar-link">Employees</a>
+            <a href="hotels.html" th:href="@{/admin/hotels}" class="sidebar-link">Hotels</a>
+            <a href="rooms.html" th:href="@{/admin/rooms}" class="sidebar-link active">Rooms</a>
         </div>
         <div class="sidebar-divider"></div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Views</div>
-            <a href="/views/available-rooms" class="sidebar-link">Available Rooms</a>
-            <a href="/views/hotel-capacity" class="sidebar-link">Hotel Capacity</a>
+            <a href="../views/available-rooms.html" th:href="@{/views/available-rooms}" class="sidebar-link">Available Rooms</a>
+            <a href="../views/hotel-capacity.html" th:href="@{/views/hotel-capacity}" class="sidebar-link">Hotel Capacity</a>
         </div>
     </aside>
 
@@ -44,7 +44,7 @@
 
             <div class="card">
                 <div class="card-header">Add New Room</div>
-                <form action="/admin/rooms" method="post">
+                <form action="rooms.html" th:action="@{/admin/rooms}" method="post">
                     <div class="form-grid form-grid-4 mb-3">
                         <div class="form-group">
                             <label class="form-label">Hotel</label>
@@ -68,6 +68,15 @@
                         <div class="form-group">
                             <label class="form-label">Price ($)</label>
                             <input type="number" name="price" class="form-control" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Amenities</label>
+                        <div class="amenity-grid">
+                            <label class="form-check amenity-option" th:each="amenity : ${amenities}">
+                                <input type="checkbox" name="amenityIds" th:value="${amenity.amenityId}" class="form-check-input">
+                                <span class="form-check-label" th:text="${amenity.name}"></span>
+                            </label>
                         </div>
                     </div>
                     <div class="form-grid form-grid-4">
@@ -102,7 +111,7 @@
                 <div class="table-wrap">
                     <table class="table">
                         <thead>
-                            <tr><th>ID</th><th>Hotel</th><th>Room #</th><th>Capacity</th><th>Price</th><th>View</th><th>Ext.</th><th>Problems</th><th></th></tr>
+                            <tr><th>ID</th><th>Hotel</th><th>Room #</th><th>Capacity</th><th>Price</th><th>Amenities</th><th>View</th><th>Ext.</th><th>Problems</th><th></th></tr>
                         </thead>
                         <tbody>
                             <tr th:each="r : ${rooms}">
@@ -111,12 +120,18 @@
                                 <td><strong th:text="${r.roomNumber}"></strong></td>
                                 <td><span class="tag tag--green" th:text="${r.capacity}"></span></td>
                                 <td><strong th:text="'$' + ${r.price}"></strong></td>
+                                <td>
+                                    <div class="tag-list" th:if="${!r.amenities.isEmpty()}">
+                                        <span class="tag tag--neutral" th:each="amenity : ${r.amenities}" th:text="${amenity.name}"></span>
+                                    </div>
+                                    <span th:if="${r.amenities.isEmpty()}" class="text-muted">-</span>
+                                </td>
                                 <td th:text="${r.viewType} ?: '-'"></td>
                                 <td th:text="${r.extendable} ? 'Yes' : 'No'"></td>
                                 <td th:text="${r.problems} ?: '-'"></td>
                                 <td>
                                     <a th:href="@{/admin/rooms/edit/{id}(id=${r.roomId})}" class="btn btn-primary" style="margin-right: 5px;">Edit</a>
-                                    <form action="/admin/rooms/delete" method="post" class="d-inline">
+                                    <form action="rooms.html" th:action="@{/admin/rooms/delete}" method="post" class="d-inline">
                                         <input type="hidden" name="roomId" th:value="${r.roomId}">
                                         <button class="btn btn-danger">Delete</button>
                                     </form>

@@ -1,6 +1,8 @@
 package com.ehotels.service;
 
+import com.ehotels.model.Booking;
 import com.ehotels.model.Renting;
+import com.ehotels.repository.BookingRepository;
 import com.ehotels.repository.RentingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +17,12 @@ public class RentingService {
     @Autowired
     private RentingRepository rentingRepository;
 
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private ReservationSnapshotService reservationSnapshotService;
+
     public List<Renting> getAllRentings() {
         return rentingRepository.findAll();
     }
@@ -24,16 +32,16 @@ public class RentingService {
     }
 
     @CacheEvict(value = "availableRooms", allEntries = true)
-    public Renting createFromBooking(Integer bookingId, Integer roomId,
-                                     Integer customerId, Integer employeeId,
-                                     LocalDate startDate, LocalDate endDate) {
+    public Renting createFromBooking(Integer bookingId, Integer employeeId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow();
         Renting renting = new Renting();
         renting.setBookingId(bookingId);
-        renting.setRoomId(roomId);
-        renting.setCustomerId(customerId);
+        renting.setRoomId(booking.getRoomId());
+        renting.setCustomerId(booking.getCustomerId());
         renting.setEmployeeId(employeeId);
-        renting.setStartDate(startDate);
-        renting.setEndDate(endDate);
+        renting.setStartDate(booking.getStartDate());
+        renting.setEndDate(booking.getEndDate());
+        reservationSnapshotService.copyBookingSnapshotToRenting(booking, renting);
         renting.setCheckInAt(LocalDateTime.now());
         renting.setStatus("active");
         return rentingRepository.save(renting);
@@ -49,6 +57,7 @@ public class RentingService {
         renting.setEmployeeId(employeeId);
         renting.setStartDate(startDate);
         renting.setEndDate(endDate);
+        reservationSnapshotService.populateRentingSnapshot(renting);
         renting.setCheckInAt(LocalDateTime.now());
         renting.setStatus("active");
         return rentingRepository.save(renting);

@@ -21,7 +21,6 @@ public class EmployeeController {
     @Autowired private BookingService bookingService;
     @Autowired private RentingService rentingService;
     @Autowired private PaymentService paymentService;
-    @Autowired private BookingRepository bookingRepository;
     @Autowired private EmployeeRepository employeeRepository;
     @Autowired private CustomerRepository customerRepository;
     @Autowired private RoomRepository roomRepository;
@@ -39,11 +38,7 @@ public class EmployeeController {
     @PostMapping("/check-in")
     public String checkIn(@RequestParam Integer bookingId,
                           @RequestParam Integer employeeId) {
-        var booking = bookingRepository.findById(bookingId).orElseThrow();
-        rentingService.createFromBooking(
-            bookingId, booking.getRoomId(), booking.getCustomerId(),
-            employeeId, booking.getStartDate(), booking.getEndDate()
-        );
+        rentingService.createFromBooking(bookingId, employeeId);
         return "redirect:/employee/dashboard";
     }
 

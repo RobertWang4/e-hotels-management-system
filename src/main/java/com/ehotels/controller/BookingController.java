@@ -24,7 +24,7 @@ public class BookingController {
 
     @GetMapping("/bookings/new")
     public String newBookingForm(@RequestParam Integer roomId, Model model) {
-        model.addAttribute("room", roomRepository.findById(roomId).orElseThrow());
+        model.addAttribute("room", roomRepository.findWithAmenitiesById(roomId).orElseThrow());
         model.addAttribute("customers", customerRepository.findAll());
         return "booking";
     }

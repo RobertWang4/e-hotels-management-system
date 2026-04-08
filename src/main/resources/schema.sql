@@ -28,6 +28,7 @@ CREATE TABLE hotel (
     area VARCHAR(100) NOT NULL,
     contact_email VARCHAR(100) NOT NULL,
     contact_phone VARCHAR(20) NOT NULL,
+    -- Kept nullable at insert time because hotel creation precedes the first employee assignment.
     manager_employee_id INT,
     FOREIGN KEY (chain_id) REFERENCES hotel_chain(chain_id) ON DELETE CASCADE
 );
@@ -96,6 +97,12 @@ CREATE TABLE booking (
     booking_id SERIAL PRIMARY KEY,
     customer_id INT,
     room_id INT,
+    customer_name_snapshot VARCHAR(100) NOT NULL,
+    customer_id_number_snapshot VARCHAR(50) NOT NULL,
+    room_number_snapshot VARCHAR(100) NOT NULL,
+    hotel_name_snapshot VARCHAR(100) NOT NULL,
+    room_price_snapshot DECIMAL(10, 2) NOT NULL CHECK (room_price_snapshot > 0),
+    room_capacity_snapshot VARCHAR(20) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -110,6 +117,12 @@ CREATE TABLE renting (
     room_id INT,
     employee_id INT,
     booking_id INT,
+    customer_name_snapshot VARCHAR(100) NOT NULL,
+    customer_id_number_snapshot VARCHAR(50) NOT NULL,
+    room_number_snapshot VARCHAR(100) NOT NULL,
+    hotel_name_snapshot VARCHAR(100) NOT NULL,
+    room_price_snapshot DECIMAL(10, 2) NOT NULL CHECK (room_price_snapshot > 0),
+    room_capacity_snapshot VARCHAR(20) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     check_in_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -7,13 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body>
 <nav class="topbar">
     <div class="topbar-inner">
-        <a href="/" class="brand">e<span>Hotels</span></a>
-        <a href="/employee/dashboard" class="topbar-link">Staff Login</a>
+        <a href="index.html" th:href="@{/}" class="brand">e<span>Hotels</span></a>
+        <a href="staff-access.html" th:href="@{/staff}" class="topbar-link">Staff Access</a>
     </div>
 </nav>
 
@@ -25,28 +25,32 @@
 
     <div class="card">
         <div class="card-header">Search Filters</div>
-        <form action="/search/results" method="get" id="searchForm">
+        <form action="search.html" th:action="@{/search/results}" method="get" id="searchForm">
+            <div class="search-meta mb-3">
+                <span class="tag tag--amber">Live filters</span>
+                <p class="form-help mb-0">Change any field and the results table refreshes automatically. The button remains as a manual fallback.</p>
+            </div>
             <div class="form-grid form-grid-4 mb-3">
                 <div class="form-group">
                     <label class="form-label">Start Date *</label>
-                    <input type="date" name="startDate" class="form-control" required>
+                    <input type="date" name="startDate" class="form-control search-filter" th:value="${selectedStartDate}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">End Date *</label>
-                    <input type="date" name="endDate" class="form-control" required>
+                    <input type="date" name="endDate" class="form-control search-filter" th:value="${selectedEndDate}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Area</label>
                     <select name="area" class="form-select search-filter">
                         <option value="">All Areas</option>
-                        <option th:each="a : ${areas}" th:value="${a}" th:text="${a}"></option>
+                        <option th:each="a : ${areas}" th:value="${a}" th:text="${a}" th:selected="${selectedArea == a}"></option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Hotel Chain</label>
                     <select name="chainId" class="form-select search-filter">
                         <option value="">All Chains</option>
-                        <option th:each="c : ${chains}" th:value="${c.chainId}" th:text="${c.name}"></option>
+                        <option th:each="c : ${chains}" th:value="${c.chainId}" th:text="${c.name}" th:selected="${selectedChainId == c.chainId}"></option>
                     </select>
                 </div>
             </div>
@@ -55,36 +59,36 @@
                     <label class="form-label">Star Rating</label>
                     <select name="category" class="form-select search-filter">
                         <option value="">Any</option>
-                        <option value="1">1 Star</option>
-                        <option value="2">2 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="5">5 Stars</option>
+                        <option value="1" th:selected="${selectedCategory == 1}">1 Star</option>
+                        <option value="2" th:selected="${selectedCategory == 2}">2 Stars</option>
+                        <option value="3" th:selected="${selectedCategory == 3}">3 Stars</option>
+                        <option value="4" th:selected="${selectedCategory == 4}">4 Stars</option>
+                        <option value="5" th:selected="${selectedCategory == 5}">5 Stars</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Capacity</label>
                     <select name="capacity" class="form-select search-filter">
                         <option value="">Any</option>
-                        <option value="single">Single</option>
-                        <option value="double">Double</option>
-                        <option value="triple">Triple</option>
-                        <option value="quad">Quad</option>
+                        <option value="single" th:selected="${selectedCapacity == 'single'}">Single</option>
+                        <option value="double" th:selected="${selectedCapacity == 'double'}">Double</option>
+                        <option value="triple" th:selected="${selectedCapacity == 'triple'}">Triple</option>
+                        <option value="quad" th:selected="${selectedCapacity == 'quad'}">Quad</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Hotel Total Rooms</label>
-                    <input type="number" name="totalRooms" class="form-control search-filter" min="1" placeholder="Any">
+                    <input type="number" name="totalRooms" class="form-control search-filter" min="1" placeholder="Any" th:value="${selectedTotalRooms}">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Min Price ($)</label>
-                    <input type="number" name="minPrice" class="form-control search-filter" step="0.01" placeholder="0">
+                    <input type="number" name="minPrice" class="form-control search-filter" step="0.01" placeholder="0" th:value="${selectedMinPrice}">
                 </div>
             </div>
             <div class="form-grid form-grid-4">
                 <div class="form-group">
                     <label class="form-label">Max Price ($)</label>
-                    <input type="number" name="maxPrice" class="form-control search-filter" step="0.01" placeholder="999">
+                    <input type="number" name="maxPrice" class="form-control search-filter" step="0.01" placeholder="999" th:value="${selectedMaxPrice}">
                 </div>
                 <div class="form-group"></div>
                 <div class="form-group"></div>
@@ -95,52 +99,102 @@
         </form>
     </div>
 
-    <div class="card" th:if="${!rooms.isEmpty()}">
-        <div class="card-title-count" th:text="'Results - ' + ${rooms.size()} + ' rooms found'"></div>
-        <div class="table-wrap">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Room ID</th>
-                        <th>Room #</th>
-                        <th>Capacity</th>
-                        <th>Price / Night</th>
-                        <th>View</th>
-                        <th>Extendable</th>
-                        <th>Problems</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="room : ${rooms}">
-                        <td th:text="${room.roomId}"></td>
-                        <td><strong th:text="${room.roomNumber}"></strong></td>
-                        <td><span class="tag tag--green" th:text="${room.capacity}"></span></td>
-                        <td><strong th:text="'$' + ${room.price}"></strong></td>
-                        <td th:text="${room.viewType} ?: 'N/A'"></td>
-                        <td th:text="${room.extendable} ? 'Yes' : 'No'"></td>
-                        <td th:text="${room.problems} ?: '-'"></td>
-                        <td><a th:href="@{/bookings/new(roomId=${room.roomId})}" class="btn btn-primary btn-sm">Book</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div th:if="${rooms.isEmpty()}" class="empty-state">
-        <p>No rooms found. Select dates and adjust your filters to search.</p>
+    <div id="searchResults">
+        <div th:replace="~{fragments/search-results :: results}"></div>
     </div>
 </div>
 
 <script>
-document.querySelectorAll('.search-filter').forEach((input) => {
-    input.addEventListener('change', () => {
-        const form = document.getElementById('searchForm');
-        if (form.startDate.value && form.endDate.value) {
-            form.requestSubmit();
+(() => {
+    const form = document.getElementById('searchForm');
+    const results = document.getElementById('searchResults');
+    if (!form || !results) {
+        return;
+    }
+    if (window.location.protocol === 'file:') {
+        results.innerHTML = `
+            <div class="card">
+                <div class="card-header">Backend Required</div>
+                <div class="empty-state">
+                    <p>This page is being opened as a static file preview.</p>
+                    <p>Room search only works when the Spring Boot app is running and you open <strong>http://localhost:8080/search</strong>.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    const filters = form.querySelectorAll('.search-filter');
+    let debounceId = null;
+
+    const hasDateRange = () => Boolean(form.startDate.value && form.endDate.value);
+
+    const showLoadingState = () => {
+        results.classList.add('search-results--loading');
+        results.innerHTML = `
+            <div class="card">
+                <div class="card-header">Updating Results</div>
+                <div class="empty-state">
+                    <p>Refreshing available rooms for the current filters...</p>
+                </div>
+            </div>
+        `;
+    };
+
+    const fetchResults = async () => {
+        if (!hasDateRange()) {
+            return;
+        }
+
+        const params = new URLSearchParams();
+        for (const [key, value] of new FormData(form).entries()) {
+            if (value !== null && value !== undefined && String(value).trim() !== '') {
+                params.append(key, value);
+            }
+        }
+        const pageUrl = `${form.action}?${params.toString()}`;
+        const fragmentBaseUrl = form.action.replace(/\/results$/, '/results-fragment');
+        const fragmentUrl = `${fragmentBaseUrl}?${params.toString()}`;
+
+        showLoadingState();
+
+        try {
+            const response = await fetch(fragmentUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Search refresh failed with ${response.status}`);
+            }
+
+            results.innerHTML = await response.text();
+            results.classList.remove('search-results--loading');
+            window.history.replaceState({}, '', pageUrl);
+        } catch (error) {
+            window.location.assign(pageUrl);
+        }
+    };
+
+    const scheduleRefresh = () => {
+        clearTimeout(debounceId);
+        debounceId = window.setTimeout(fetchResults, 250);
+    };
+
+    filters.forEach((field) => {
+        field.addEventListener('change', scheduleRefresh);
+        if (field.tagName === 'INPUT') {
+            field.addEventListener('input', scheduleRefresh);
         }
     });
-});
+
+    form.addEventListener('submit', (event) => {
+        if (!hasDateRange()) {
+            return;
+        }
+        event.preventDefault();
+        clearTimeout(debounceId);
+        fetchResults();
+    });
+})();
 </script>
 </body>
 </html>

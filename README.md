@@ -62,7 +62,7 @@ spring.datasource.password=YOUR_PASSWORD
 The app will automatically:
 - Create all tables (schema.sql)
 - Populate sample data (data.sql)
-- Create triggers, views, and indexes (DatabaseObjectsInitializer)
+- Create triggers, views, and indexes from classpath SQL init scripts
 
 ### 5. Open in browser
 
@@ -90,15 +90,11 @@ http://localhost:8080
 ehotels/
 ├── pom.xml
 ├── sql/
-│   ├── queries.sql          # 8 SQL queries (2c)
-│   ├── triggers.sql         # 6 triggers (2d)
-│   ├── indexes.sql          # 8 indexes (2e)
-│   └── views.sql            # 2 views (2f)
+│   └── queries.sql          # Reference query set (2c)
 ├── src/main/java/com/ehotels/
 │   ├── EhotelsApplication.java
 │   ├── config/
-│   │   ├── RedisConfig.java
-│   │   └── DatabaseObjectsInitializer.java
+│   │   └── RedisConfig.java
 │   ├── model/               # JPA entities
 │   ├── repository/          # Data access layer
 │   ├── service/             # Business logic + Redis caching
@@ -107,6 +103,10 @@ ehotels/
     ├── application.properties
     ├── schema.sql            # DDL (2a)
     ├── data.sql              # Sample data (2b)
+    ├── sql/
+    │   ├── triggers.sql      # Database triggers/functions
+    │   ├── views.sql         # SQL views
+    │   └── indexes.sql       # Performance indexes
     ├── templates/            # Thymeleaf HTML pages
     └── static/css/           # Stylesheets
 ```
@@ -115,8 +115,8 @@ ehotels/
 
 - **5 hotel chains**, 8 hotels each (40 total)
 - **200 rooms** (5 per hotel)
-- **80 employees**, 20 customers
-- **20 bookings**, 15 rentings, 10 payments
+- **80 employees**, 40 customers
+- **40 bookings**, 25 rentings, 20 payments
 - **6 triggers** enforcing business rules
 - **8 indexes** with justifications
 - **2 SQL views** (available rooms per area, hotel aggregated capacity)

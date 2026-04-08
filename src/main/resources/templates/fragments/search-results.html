@@ -1,0 +1,45 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="results">
+    <div class="card" th:if="${!rooms.isEmpty()}">
+        <div class="card-title-count" th:text="'Results - ' + ${rooms.size()} + ' rooms found'"></div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Room ID</th>
+                        <th>Room #</th>
+                        <th>Capacity</th>
+                        <th>Price / Night</th>
+                        <th>Amenities</th>
+                        <th>View</th>
+                        <th>Extendable</th>
+                        <th>Problems</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="room : ${rooms}">
+                        <td th:text="${room.roomId}"></td>
+                        <td><strong th:text="${room.roomNumber}"></strong></td>
+                        <td><span class="tag tag--green" th:text="${room.capacity}"></span></td>
+                        <td><strong th:text="'$' + ${room.price}"></strong></td>
+                        <td>
+                            <div class="tag-list" th:if="${!room.amenities.isEmpty()}">
+                                <span class="tag tag--neutral" th:each="amenity : ${room.amenities}" th:text="${amenity.name}"></span>
+                            </div>
+                            <span th:if="${room.amenities.isEmpty()}" class="text-muted">-</span>
+                        </td>
+                        <td th:text="${room.viewType} ?: 'N/A'"></td>
+                        <td th:text="${room.extendable} ? 'Yes' : 'No'"></td>
+                        <td th:text="${room.problems} ?: '-'"></td>
+                        <td><a th:href="@{/bookings/new(roomId=${room.roomId})}" class="btn btn-primary btn-sm">Book</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:if="${rooms.isEmpty()}" class="empty-state">
+        <p th:if="${hasSearched}">No rooms match the current filters. Adjust the range or relax the constraints.</p>
+        <p th:unless="${hasSearched}">Pick a start date and end date to begin filtering available rooms.</p>
+    </div>
+</div>
